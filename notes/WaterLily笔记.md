@@ -36,7 +36,7 @@
   - 教程参考：<https://blog.csdn.net/qq_43630810/article/details/130613174>
 
   ```julia
-    using Pkg
+    import Pkg
     Pkg.add("WaterLily")
   ```
 
