@@ -62,7 +62,7 @@ contour(circ.flow.p')
 
 ```julia
 # WaterLily.jl
-function Simulation(dims::NTuple{N}, u_BC, L::Number; Δt=0.25, ν=0., g=nothing, U=nothing, ϵ=1, perdir=(), uλ=nothing, exitBC=false, body::AbstractBody=NoBody(), T=Float32, mem=Array)
+Simulation(dims::NTuple{N}, u_BC, L::Number; Δt=0.25, ν=0., g=nothing, U=nothing, ϵ=1, perdir=(), uλ=nothing, exitBC=false, body::AbstractBody=NoBody(), T=Float32, mem=Array)
 """
 Simulation用于创建和管理流体动力学模拟的整个过程。其中，
 dims代表模拟域的维度；
