@@ -5,15 +5,15 @@
 ### 技巧
 
 - 下载与安装
-  - Julia安装包下载地址为：https://julialang.org/downloads
-  - 安装教程：https://www.runoob.com/julia/julia-environment.html
+  - Julia安装包下载地址为：<https://julialang.org/downloads>
+  - 安装教程：<https://www.runoob.com/julia/julia-environment.html>
 - IDE选择
   - Julia语言适配的IDE为Juno，但其官网显示今后不再更新，推荐使用vscode
 - vscode环境配置
-  - 教程参考：https://zhuanlan.zhihu.com/p/163809924
+  - 教程参考：<https://zhuanlan.zhihu.com/p/163809924>
 - vscode运行Julia代码
   - 点击右上角三角形下的子选项Julia: Execute active File in REPL
-  - 教程参考：https://blog.csdn.net/hfy1237/article/details/124500193
+  - 教程参考：<https://blog.csdn.net/hfy1237/article/details/124500193>
 - 在vscode终端中输入`julia`即可进入REPL界面
 
 ### 语法
@@ -33,14 +33,14 @@
 ## WaterLily
 
 - 安装package
-  - 教程参考：https://blog.csdn.net/qq_43630810/article/details/130613174
+  - 教程参考：<https://blog.csdn.net/qq_43630810/article/details/130613174>
 
   ```julia
     using Pkg
     Pkg.add("WaterLily")
   ```
 
-- 一个水流流过圆圈的例子
+- 模拟流体流过圆形障碍物的状态的例子
 
 ```julia
 using WaterLily
@@ -57,3 +57,53 @@ contour(circ.flow.p')
 ```
 
 将上述代码用REPL运行，即可得到一个等高线图
+
+### 定义列表
+
+```julia
+# WaterLily.jl
+function Simulation(dims::NTuple{N}, u_BC, L::Number; Δt=0.25, ν=0., g=nothing, U=nothing, ϵ=1, perdir=(), uλ=nothing, exitBC=false, body::AbstractBody=NoBody(), T=Float32, mem=Array)
+"""
+Simulation用于创建和管理流体动力学模拟的整个过程。其中，
+dims代表模拟域的维度；
+u_BC代表模拟域速度边界条件，可以是一个元组或一个随时间变化的函数；
+L代表模拟的长度尺度；
+U代表模拟的速度尺度；
+Δt代表初始时间步长；
+ν代表缩放粘度；
+g代表域加速度；
+ϵ代表BDIM内核宽度；
+perdir代表在(i,)方向的域周期性边界条件；
+exitBC代表在i=1方向的对流出口边界条件；
+uλ代表生成初始速度场的函数；
+body代表浸没的几何体；
+T代表数组元素类型；
+mem代表内存位置，可以是Array、CuArray、ROCm分别对应于CPU、NVIDIA GPU或AMD GPU设备。
+"""
+time(sim::Simulation)
+"""
+返回模拟的当前累积时间。
+"""
+sim_time(sim::Simulation)
+"""
+返回模拟的当前无量纲时间。
+"""
+sim_step!(sim::Simulation,t_end;remeasure=true,max_steps=typemax(Int),verbose=false)
+sim_step!(sim::Simulation;remeasure=true)
+"""
+将模拟sim集成到无量纲时间t_end。如果remeasure=true，那么物体将会在每一个时间步长被重新测量。它能够被设置成false来为静态几何体加速模拟。
+"""
+measure!(sim::Simulation,t=sum(sim.flow.Δt))
+"""
+测量一个动态物体来更新流场和泊松方程系数。
+"""
+# WriteVTK
+vtkWriter
+write!
+default_attrib
+pvd_collection
+# ReadVTK
+restart_sim!
+check_nthreads(::Val{1})
+__init__()
+```
