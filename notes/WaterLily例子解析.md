@@ -195,3 +195,52 @@ writer = restart_sim!(sim; fname="file_restart.pvd") # 重新启动模拟，fnam
 write!(writer, sim) # 将数据附加到用于重新启动的文件中
 close(writer)
 ```
+
+## 9.一个2D参数化壳体的例子
+```julia
+using WaterLily
+
+# 定义一个函数来生成具有特定曲率的边界
+function curved_square(n, m; curvature_top=-0.05, curvature_bottom=0.05, curvature_left_right=0.05)
+    # 网格尺寸
+    Lx, Ly = m/2, n/2
+    
+    # 定义 SDF 函数
+    sdf(x, t) = begin
+        # 初始化距离为无穷大
+        dist = Inf
+        
+        # 顶部曲线
+        curve_top(x) = curvature_top * ((x-n/2)^2-(Ly/2)^2)  + Ly / 2 + m/2
+        dist_top =  x[2] - curve_top(x[1]) 
+        
+        # 底部曲线
+        curve_bottom(x) = curvature_bottom * ((x-n/2)^2-(Ly/2)^2) - Ly / 2 + m/2
+        dist_bottom = curve_bottom(x[1]) - x[2]  
+        
+        # 左侧曲线
+        curve_left(y) = -curvature_left_right * ((y-m/2)^2-(Lx/2)^2) - Lx / 2 + n/2
+        dist_left = curve_left(x[2]) - x[1]
+        
+        # 右侧曲线
+        curve_right(y) = curvature_left_right * ((y-m/2)^2-(Lx/2)^2) + Lx / 2 + n/2
+        dist_right = x[1] - curve_right(x[2]) 
+        
+        # 返回最距离作为 SDF
+        max(dist_top, dist_bottom, dist_left, dist_right)
+    end
+    
+    # 创建 AutoBody 对象
+    body = AutoBody(sdf)
+    
+    return body
+end
+function sim_generate(n, m; curvature_top=-0.01, curvature_bottom=0.01, curvature_left_right=0.01)
+    body = curved_square(n, m; curvature_top=curvature_top, curvature_bottom=curvature_bottom, curvature_left_right=curvature_left_right)
+    sim = Simulation((n, m), (1,0), m; ν=1e-3, body=body)
+    return sim
+end
+include("TwoD_plots.jl")
+sim_gif!(sim_generate(64,64), duration=10, clims=(-5, 5), plotbody=true)
+```
+使用SDF函数模拟曲线，组合成几何体，这里使用了和叶学长论文一致的三个曲率参数来表示，可以调整参数试试效果。
