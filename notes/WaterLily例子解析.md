@@ -258,3 +258,5 @@ include("TwoD_plots.jl")
 sim_gif!(sim_generate(64,64), duration=10, clims=(-5, 5), plotbody=true)
 ```
 使用SDF函数模拟曲线，组合成几何体，这里使用了和叶学长论文一致的三个曲率参数来表示，可以调整参数试试效果。
+
+![随便选了个参数的结果](https://imgur.com/cuFRHJA)
