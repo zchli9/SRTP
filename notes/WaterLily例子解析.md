@@ -203,7 +203,7 @@ using WaterLily
 # 定义一个函数来生成具有特定曲率的边界
 function curved_square(n, m; curvature_top=-0.05, curvature_bottom=0.05, curvature_left_right=0.05)
     # 网格尺寸
-    Lx, Ly = m/2, n/2
+    Lx, Ly = m/16, n/16
     
     # 定义 SDF 函数
     sdf(x, t) = begin
@@ -211,11 +211,25 @@ function curved_square(n, m; curvature_top=-0.05, curvature_bottom=0.05, curvatu
         dist = Inf
         
         # 顶部曲线
-        curve_top(x) = curvature_top * ((x-n/2)^2-(Ly/2)^2)  + Ly / 2 + m/2
+        curve_top(x) = begin
+            if(x[1] < n/2 + Lx/2 && x[1] > n/2 - Lx/2)
+                return curvature_top * ((x[1]-n/2)^2-(Lx/2)^2) + Ly / 2 + m/2
+            else
+                return Ly / 2 + m/2
+            end
+        end
+        # curvature_top * ((x-n/2)^2-(Ly/2)^2)  + Ly / 2 + m/2
         dist_top =  x[2] - curve_top(x[1]) 
         
         # 底部曲线
-        curve_bottom(x) = curvature_bottom * ((x-n/2)^2-(Ly/2)^2) - Ly / 2 + m/2
+        curve_bottom(x) = begin
+            if(x[1] < n/2 + Lx/2 && x[1] > n/2 - Lx/2)
+                return curvature_bottom * ((x[1]-n/2)^2-(Lx/2)^2) - Ly / 2 + m/2
+            else
+                return -Ly / 2 + m/2
+            end
+        end
+        # curvature_bottom * ((x-n/2)^2-(Ly/2)^2) - Ly / 2 + m/2
         dist_bottom = curve_bottom(x[1]) - x[2]  
         
         # 左侧曲线
@@ -235,9 +249,9 @@ function curved_square(n, m; curvature_top=-0.05, curvature_bottom=0.05, curvatu
     
     return body
 end
-function sim_generate(n, m; curvature_top=-0.01, curvature_bottom=0.01, curvature_left_right=0.01)
+function sim_generate(n, m; curvature_top=-0.1, curvature_bottom=0.1, curvature_left_right=0.1)
     body = curved_square(n, m; curvature_top=curvature_top, curvature_bottom=curvature_bottom, curvature_left_right=curvature_left_right)
-    sim = Simulation((n, m), (1,0), m; ν=1e-3, body=body)
+    sim = Simulation((n, m), (0.21,0), m; ν=1e-3, body=body)
     return sim
 end
 include("TwoD_plots.jl")
